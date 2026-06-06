@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>SLIDE-PATTERN ギャラリー</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #F0F0F0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #333;
+  }
+  .header {
+    background: #1A1A2E;
+    color: #FFF;
+    padding: 28px 40px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.04em; }
+  .header p { font-size: 13px; color: #AAA; margin-top: 4px; }
+  .header-meta { font-size: 12px; color: #888; margin-top: 6px; }
+  .toc-nav {
+    background: #FFFFFF;
+    border-bottom: 1px solid #E0E0E0;
+    padding: 12px 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .toc-nav a {
+    font-size: 12px;
+    color: #555;
+    text-decoration: none;
+    background: #F5F5F5;
+    border: 1px solid #E0E0E0;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .toc-nav a:hover { background: #E8E8E8; color: #222; }
+  .main { padding: 32px 40px 60px; }
+  .category-section { margin-bottom: 48px; }
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333;
+  }
+  .category-icon { font-size: 20px; }
+  .category-title { font-size: 18px; font-weight: 700; color: #1A1A2E; }
+  .category-count {
+    font-size: 12px;
+    color: #999;
+    background: #EEEEEE;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .pattern-card {
+    background: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: box-shadow 0.15s, transform 0.15s;
+    cursor: pointer;
+  }
+  .pattern-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+  .slide-preview {
+    width: 320px;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: #FAFAFA;
+  }
+  .slide-preview iframe {
+    width: 960px;
+    height: 540px;
+    border: none;
+    transform: scale(0.3333);
+    transform-origin: top left;
+    pointer-events: none;
+  }
+  .card-footer {
+    padding: 10px 14px 12px;
+    border-top: 1px solid #F0F0F0;
+    background: #FDFDFD;
+  }
+  .pattern-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    font-family: "SF Mono", "Fira Code", monospace;
+    word-break: break-all;
+  }
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.active { display: flex; }
+  .overlay-inner {
+    background: #E8E8E8;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 1000px;
+    width: 90vw;
+  }
+  .overlay-header {
+    background: #1A1A2E;
+    color: #FFF;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .overlay-header h3 { font-size: 14px; font-family: monospace; }
+  .overlay-close {
+    background: none;
+    border: none;
+    color: #FFF;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+  }
+  .overlay-body { padding: 20px; display: flex; justify-content: center; }
+  .overlay-iframe-wrap {
+    width: 960px;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+  }
+  .overlay-iframe-wrap iframe { width: 960px; height: 540px; border: none; }
+  @media (max-width: 800px) {
+    .toc-nav { padding: 10px 16px; }
+    .main { padding: 20px 16px 40px; }
+    .pattern-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SLIDE-PATTERN ギャラリー</h1>
+  <p>スライドレイアウトパターン一覧 — カードをクリックすると拡大表示</p>
+  <div class="header-meta" id="header-meta"></div>
+</div>
+<nav class="toc-nav" id="toc-nav"></nav>
+<main class="main" id="main"></main>
+
+<!-- 拡大表示オーバーレイ -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="overlay-inner" onclick="event.stopPropagation()">
+    <div class="overlay-header">
+      <h3 id="overlay-title"></h3>
+      <button class="overlay-close" onclick="closeOverlay()">✕</button>
+    </div>
+    <div class="overlay-body">
+      <div class="overlay-iframe-wrap">
+        <iframe id="overlay-iframe" src="" width="960" height="540"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============================================================
+// パターンデータ定義
+// 新しいパターンを追加するときは、該当カテゴリの patterns 配列に
+// パターン名（フォルダ名の "SLIDE-PATTERN-" より後の部分）を1行追加するだけ。
+// 例: patterns: ["既存パターン名", "新しいパターン名"]
+// =============================================================
+const CATEGORIES = [
+  {
+    id: "cover",
+    icon: "🎯",
+    title: "表紙・セクション",
+    patterns: [
+      "cover-title-center",
+      "cover-with-image-left",
+      "cover-gradient-text-bottom",
+      "cover-logo-mark-centered",
+      "cover-fullbg-text-left",
+      "cover-minimal-disclaimer",
+      "section-divider",
+      "closing-slide",
+    ]
+  },
+  {
+    id: "toc",
+    icon: "📋",
+    title: "目次",
+    patterns: [
+      "agenda-toc",
+      "numbered-toc",
+      "two-column-toc",
+      "sidebar-toc-panel",
+      "category-toc-simple",
+      "category-toc-with-image",
+    ]
+  },
+  {
+    id: "content",
+    icon: "✏️",
+    title: "コンテンツ（本文）",
+    patterns: [
+      "key-message-single",
+      "two-col-text-body",
+      "two-section-stacked-text",
+      "image-left-text-right",
+      "quote-large-center",
+    ]
+  },
+  {
+    id: "list",
+    icon: "📝",
+    title: "テキストリスト",
+    patterns: [
+      "numbered-list-with-body",
+      "numbered-list-hexagon-badge",
+      "numbered-two-col-row",
+      "numbered-two-col-row-with-accent",
+      "numbered-row-full-width",
+      "icon-left-text-list",
+      "icon-left-text-list-detailed",
+      "three-tier-segment-list",
+    ]
+  },
+  {
+    id: "flow",
+    icon: "➡️",
+    title: "フロー・ステップ",
+    patterns: [
+      "four-step-flow",
+      "four-step-flow-with-callout",
+      "four-step-card-flow",
+      "two-feature-with-result",
+      "horizontal-timeline-cards",
+      "milestone-timeline",
+      "three-stage-circle-flow",
+      "circle-node-step-flow",
+      "vertical-step-flow",
+      "vertical-step-flow-with-sidebar",
+      "vertical-step-three-col",
+      "vertical-timeline-label-list",
+      "staircase-roadmap",
+      "staircase-roadmap-layered",
+      "staircase-roadmap-with-icons",
+    ]
+  },
+  {
+    id: "diagram",
+    icon: "🔄",
+    title: "図解・ダイアグラム",
+    patterns: [
+      "cycle-diagram-with-labels",
+      "pdca-cycle-diagram",
+      "two-circle-bilateral-flow",
+      "hub-spoke-diagram",
+      "center-illustration-spoke",
+      "circle-hub-list-right",
+      "polygon-hub-spoke",
+      "four-quadrant-center-circle",
+      "donut-chart-spoke-labels",
+      "org-chart-tree",
+      "two-column-split-boxes",
+      "two-col-icon-list-comparison",
+    ]
+  },
+  {
+    id: "cards",
+    icon: "🃏",
+    title: "カード・グリッド",
+    patterns: [
+      "four-card-2x2",
+      "six-card-two-column",
+      "six-card-2x3-grid",
+      "eight-card-2x4-grid",
+      "three-column-icon-card",
+      "three-col-icon-card-header-band",
+      "three-col-icon-card-with-cta",
+      "three-col-icon-card-body-text",
+      "three-col-large-icon-card",
+      "three-col-numbered-card",
+      "three-card-icon-with-subheading",
+      "feature-metrics-four-cells",
+    ]
+  },
+  {
+    id: "chart",
+    icon: "📊",
+    title: "グラフ・データ",
+    patterns: [
+      "bar-chart-full",
+      "kpi-bar-chart",
+      "chart-left-text-right",
+      "chart-with-callout",
+      "pie-chart-left-list-right",
+      "donut-chart-left-icon-list-right",
+      "donut-left-kpi-bar-right",
+      "headline-three-donut-charts",
+      "text-body-left-donut-right",
+      "three-col-kpi-with-chart",
+      "two-col-list-and-chart",
+      "two-chart-panel",
+      "headline-three-chart-grid",
+    ]
+  },
+  {
+    id: "table",
+    icon: "📑",
+    title: "テーブル・比較",
+    patterns: [
+      "comparison-matrix-table",
+      "comparison-table-with-highlight",
+      "pricing-plan-cards",
+      "pricing-comparison-table",
+      "status-progress-table",
+      "before-after-two-col",
+      "problem-solution",
+      "risk-matrix-2x2",
+    ]
+  },
+  {
+    id: "kpi",
+    icon: "🏆",
+    title: "KPI・まとめ",
+    patterns: [
+      "three-kpi-big-number",
+      "goal-kgi-kpi-dashboard",
+      "summary-three-points",
+      "action-items-list",
+    ]
+  },
+  {
+    id: "faq",
+    icon: "❓",
+    title: "Q&A・FAQ",
+    patterns: [
+      "faq-grid",
+      "faq-three-column-grid",
+      "faq-single-column",
+      "faq-stacked-qa-boxes",
+    ]
+  },
+  {
+    id: "profile",
+    icon: "👤",
+    title: "プロフィール",
+    patterns: [
+      "profile-bio",
+      "profile-bio-photo-right",
+      "team-org-with-photo",
+      "step-detail-photo-aside",
+    ]
+  },
+];
+
+// =============================================================
+// 以下はHTML生成ロジック（通常は変更不要）
+// =============================================================
+
+function buildGallery() {
+  const totalPatterns = CATEGORIES.reduce((sum, c) => sum + c.patterns.length, 0);
+
+  // ヘッダーのカウント更新
+  document.getElementById('header-meta').textContent =
+    `計 ${totalPatterns} パターン｜${CATEGORIES.length} カテゴリ`;
+
+  // 目次ナビ生成
+  const nav = document.getElementById('toc-nav');
+  CATEGORIES.forEach(cat => {
+    const a = document.createElement('a');
+    a.href = `#${cat.id}`;
+    a.textContent = `${cat.icon} ${cat.title}`;
+    nav.appendChild(a);
+  });
+
+  // カテゴリセクション生成
+  const main = document.getElementById('main');
+  CATEGORIES.forEach(cat => {
+    const section = document.createElement('section');
+    section.className = 'category-section';
+    section.id = cat.id;
+
+    // カテゴリヘッダー
+    section.innerHTML = `
+      <div class="category-header">
+        <span class="category-icon">${cat.icon}</span>
+        <span class="category-title">${cat.title}</span>
+        <span class="category-count">${cat.patterns.length} パターン</span>
+      </div>
+      <div class="pattern-grid"></div>
+    `;
+
+    const grid = section.querySelector('.pattern-grid');
+
+    // パターンカード生成
+    cat.patterns.forEach(name => {
+      const fullName = `SLIDE-PATTERN-${name}`;
+      const card = document.createElement('div');
+      card.className = 'pattern-card';
+      card.onclick = () => openOverlay(fullName);
+      card.innerHTML = `
+        <div class="slide-preview">
+          <iframe src="patterns/${fullName}/${fullName}.html" loading="lazy"></iframe>
+        </div>
+        <div class="card-footer">
+          <div class="pattern-name">${name}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    main.appendChild(section);
+  });
+}
+
+function openOverlay(name) {
+  const overlay = document.getElementById('overlay');
+  const iframe = document.getElementById('overlay-iframe');
+  document.getElementById('overlay-title').textContent = name;
+  iframe.src = `patterns/${name}/${name}.html`;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOverlay(e) {
+  if (e && e.target !== document.getElementById('overlay') &&
+      !e.target.classList.contains('overlay-close')) return;
+  document.getElementById('overlay').classList.remove('active');
+  document.getElementById('overlay-iframe').src = '';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeOverlay({ target: document.getElementById('overlay') });
+});
+
+buildGallery();
+</script>
+</body>
+</html>
