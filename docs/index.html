@@ -247,18 +247,89 @@
     text-align: center;
   }
 
+  /* ===== デザインシステムセクション ===== */
+  .ds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    gap: 20px;
+  }
+  .ds-card {
+    background: #FFF;
+    border: 1px solid #DDDDDD;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: box-shadow 0.15s, transform 0.15s;
+    cursor: pointer;
+  }
+  .ds-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+  .ds-preview {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: #FAFAFA;
+  }
+  .ds-preview iframe {
+    width: 960px;
+    height: 540px;
+    border: none;
+    transform: scale(0.3333);
+    transform-origin: top left;
+    pointer-events: none;
+  }
+  .ds-card-footer {
+    padding: 10px 14px 12px;
+    border-top: 1px solid #F0F0F0;
+    background: #FDFDFD;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ds-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    font-family: "SF Mono", "Fira Code", monospace;
+  }
+  .ds-badge {
+    font-size: 10px;
+    color: #888;
+    background: #F0F0F0;
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+    padding: 2px 8px;
+  }
+
+  /* デザインシステムオーバーレイのプレビュー（スクロール可能） */
+  .ds-iframe-wrap {
+    width: 960px;
+    max-width: 100%;
+    height: 580px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ds-iframe-wrap iframe {
+    width: 960px;
+    height: 100%;
+    border: none;
+  }
+
   @media (max-width: 800px) {
     .toc-nav { padding: 10px 16px; }
     .main { padding: 20px 16px 40px; }
     .pattern-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .ds-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>SLIDE-PATTERN ギャラリー</h1>
-  <p>スライドレイアウトパターン一覧 — カードをクリックするとプレビューとMDファイルを確認できます</p>
+  <h1>SLIDE.md ギャラリー</h1>
+  <p>デザインシステムサンプルとスライドレイアウトパターンの一覧 — カードをクリックするとプレビューとファイル内容を確認できます</p>
   <div class="header-meta" id="header-meta"></div>
 </div>
 <nav class="toc-nav" id="toc-nav"></nav>
@@ -277,7 +348,7 @@
     </div>
     <!-- プレビュータブ -->
     <div id="tab-preview" class="tab-panel active">
-      <div class="overlay-iframe-wrap">
+      <div id="overlay-preview-wrap" class="overlay-iframe-wrap">
         <iframe id="overlay-iframe" src="" width="960" height="540"></iframe>
       </div>
     </div>
@@ -489,24 +560,96 @@ const CATEGORIES = [
 ];
 
 // =============================================================
+// デザインシステムデータ定義
+// =============================================================
+const DESIGN_SYSTEMS = [
+  {
+    id: "anthropic",
+    name: "SLIDE-md-anthropic",
+    label: "Anthropic",
+    desc: "テクノロジー・AI関連のカンファレンス向け",
+  },
+  {
+    id: "blue-simple-diagram",
+    name: "SLIDE-md-blue-simple-diagram",
+    label: "Blue Simple Diagram",
+    desc: "シンプルな図解・データ向け",
+  },
+  {
+    id: "digital",
+    name: "SLIDE-md-digital",
+    label: "デジタル庁（DADS）",
+    desc: "行政・官公庁向けビジネス資料",
+  },
+  {
+    id: "green-blue-business",
+    name: "SLIDE-md-green-blue-business",
+    label: "Green Blue Business",
+    desc: "BtoBビジネス・営業資料向け",
+  },
+];
+
+// =============================================================
 // 以下はHTML生成ロジック（通常は変更不要）
 // =============================================================
 
 let currentMdContent = '';
 
+function buildDesignSystems() {
+  const main = document.getElementById('main');
+  const section = document.createElement('section');
+  section.className = 'category-section';
+  section.id = 'design-systems';
+  section.innerHTML = `
+    <div class="category-header">
+      <span class="category-icon">🎨</span>
+      <span class="category-title">デザインシステム サンプル</span>
+      <span class="category-count">${DESIGN_SYSTEMS.length} サンプル</span>
+    </div>
+    <div class="ds-grid"></div>
+  `;
+  const grid = section.querySelector('.ds-grid');
+  DESIGN_SYSTEMS.forEach(ds => {
+    const card = document.createElement('div');
+    card.className = 'ds-card';
+    card.onclick = () => openDSOverlay(ds.name, ds.label);
+    card.innerHTML = `
+      <div class="ds-preview">
+        <iframe src="design-systems/${ds.name}/sample.html" loading="lazy"></iframe>
+      </div>
+      <div class="ds-card-footer">
+        <div class="ds-name">${ds.name}</div>
+        <div class="ds-badge">${ds.desc}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  main.appendChild(section);
+}
+
 function buildGallery() {
   const totalPatterns = CATEGORIES.reduce((sum, c) => sum + c.patterns.length, 0);
 
   document.getElementById('header-meta').textContent =
-    `計 ${totalPatterns} パターン｜${CATEGORIES.length} カテゴリ`;
+    `デザインシステム ${DESIGN_SYSTEMS.length} 件｜パターン ${totalPatterns} 種類（${CATEGORIES.length} カテゴリ）`;
 
   const nav = document.getElementById('toc-nav');
+
+  // デザインシステムをTOCの先頭に追加
+  const dsLink = document.createElement('a');
+  dsLink.href = '#design-systems';
+  dsLink.textContent = '🎨 デザインシステム';
+  nav.appendChild(dsLink);
+
   CATEGORIES.forEach(cat => {
     const a = document.createElement('a');
     a.href = `#${cat.id}`;
     a.textContent = `${cat.icon} ${cat.title}`;
     nav.appendChild(a);
   });
+
+  // デザインシステムセクションを最初に生成
+  buildDesignSystems();
 
   const main = document.getElementById('main');
   CATEGORIES.forEach(cat => {
@@ -545,11 +688,23 @@ function buildGallery() {
   });
 }
 
-function openOverlay(name) {
+function openOverlayCore({ title, htmlSrc, mdSrc, mdLabel, isDS }) {
   const overlay = document.getElementById('overlay');
-  document.getElementById('overlay-title').textContent = name;
-  document.getElementById('overlay-iframe').src = `patterns/${name}/${name}.html`;
-  document.getElementById('md-toolbar-label').textContent = `${name}.md`;
+  const wrap = document.getElementById('overlay-preview-wrap');
+
+  document.getElementById('overlay-title').textContent = title;
+  document.getElementById('tab-btn-markdown').textContent = mdLabel;
+  document.getElementById('md-toolbar-label').textContent = mdLabel;
+
+  // プレビューラッパーをモードに応じて切り替え
+  if (isDS) {
+    wrap.className = 'ds-iframe-wrap';
+    document.getElementById('overlay-iframe').style.height = '100%';
+  } else {
+    wrap.className = 'overlay-iframe-wrap';
+    document.getElementById('overlay-iframe').style.height = '540px';
+  }
+  document.getElementById('overlay-iframe').src = htmlSrc;
 
   // マークダウン読み込みリセット
   currentMdContent = '';
@@ -559,14 +714,11 @@ function openOverlay(name) {
   document.getElementById('overlay-md-loading').textContent = '読み込み中...';
   resetCopyBtn();
 
-  // プレビュータブを初期表示
   switchTab('preview');
-
   overlay.classList.add('active');
   document.body.style.overflow = 'hidden';
 
-  // MDファイルをバックグラウンドで取得
-  fetch(`patterns/${name}/${name}.md`)
+  fetch(mdSrc)
     .then(res => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.text();
@@ -578,8 +730,28 @@ function openOverlay(name) {
       document.getElementById('overlay-md-loading').style.display = 'none';
     })
     .catch(() => {
-      document.getElementById('overlay-md-loading').textContent = 'MDファイルを読み込めませんでした。';
+      document.getElementById('overlay-md-loading').textContent = 'ファイルを読み込めませんでした。';
     });
+}
+
+function openOverlay(name) {
+  openOverlayCore({
+    title: name,
+    htmlSrc: `patterns/${name}/${name}.html`,
+    mdSrc:  `patterns/${name}/${name}.md`,
+    mdLabel: `${name}.md`,
+    isDS: false,
+  });
+}
+
+function openDSOverlay(name, label) {
+  openOverlayCore({
+    title: label,
+    htmlSrc: `design-systems/${name}/sample.html`,
+    mdSrc:  `design-systems/${name}/SLIDE.md`,
+    mdLabel: 'SLIDE.md',
+    isDS: true,
+  });
 }
 
 function closeOverlay(e) {
