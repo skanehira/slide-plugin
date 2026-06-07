@@ -121,7 +121,7 @@ Step 4: SLIDE-DECK.md をAIツールへ → スライド完成
 
 **→ <a href="https://sho-ai-magic.github.io/slide.md/" target="_blank">https://sho-ai-magic.github.io/slide.md/</a>**
 
-![SLIDE-PATTERN ギャラリー](docs/Gallery.png)
+![SLIDE-PATTERN ギャラリー](docs/Gallery2.png)
 
 ## 生成サンプル
 
