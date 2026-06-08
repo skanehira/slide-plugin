@@ -615,7 +615,7 @@ function buildDesignSystems() {
     card.onclick = () => openDSOverlay(ds.name, ds.label);
     card.innerHTML = `
       <div class="ds-preview">
-        <iframe src="design-systems/${ds.name}/sample.html" loading="lazy"></iframe>
+        <iframe src="SLIDE-md/${ds.name}/sample.html" loading="lazy"></iframe>
       </div>
       <div class="ds-card-footer">
         <div class="ds-name">${ds.name}</div>
@@ -747,8 +747,8 @@ function openOverlay(name) {
 function openDSOverlay(name, label) {
   openOverlayCore({
     title: label,
-    htmlSrc: `design-systems/${name}/sample.html`,
-    mdSrc:  `design-systems/${name}/SLIDE.md`,
+    htmlSrc: `SLIDE-md/${name}/sample.html`,
+    mdSrc:  `SLIDE-md/${name}/SLIDE.md`,
     mdLabel: 'SLIDE.md',
     isDS: true,
   });
