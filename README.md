@@ -172,9 +172,7 @@ Claude Codeが自動で以下をセットアップします：
 2. 解凍したフォルダ内の `skills/` にある3つのフォルダ（`slide-md-creator`・`slide-pattern-creator`・`slide-deck-builder`）を、以下の場所にコピーします。
    - **Mac：** `/Users/（ユーザー名）/.claude/skills/`
    - **Windows：** `C:\Users\（ユーザー名）\.claude\skills\`
-3. プロジェクトフォルダ内に `SLIDE-md` フォルダと `SLIDE-PATTERN` フォルダを作成し、それぞれ以下をコピーします。
-   - `docs/SLIDE-md/` 内の4つのフォルダ → `SLIDE-md/` の中
-   - `docs/SLIDE-PATTERN/` 内の99個のフォルダ → `SLIDE-PATTERN/` の中
+3. 解凍したフォルダ内の `docs/SLIDE-md/` と `docs/SLIDE-PATTERN/` を、使いたいプロジェクトフォルダにそのままコピーします。
 
 ---
 
