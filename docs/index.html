@@ -335,8 +335,16 @@
     .header h1 { font-size: 18px; }
     .header p { font-size: 13px; }
     .header-meta { font-size: 12px; }
-    .toc-nav { padding: 10px 12px; gap: 8px; }
-    .toc-nav a { font-size: 13px; padding: 6px 14px; }
+    .toc-nav {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 10px 12px;
+      gap: 8px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .toc-nav::-webkit-scrollbar { display: none; }
+    .toc-nav a { font-size: 13px; padding: 6px 14px; flex-shrink: 0; }
     .main { padding: 20px 12px 40px; }
     .category-title { font-size: 16px; }
     .category-count { font-size: 13px; }
