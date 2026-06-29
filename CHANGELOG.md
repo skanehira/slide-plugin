@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## [1.1.1] - 2026-06-29
+
+### Added
+
+**サンプルデザインシステムの拡充（docs/SLIDE-md/）**
+- サンプルを 4 種類 → 10 種類に拡充
+- 新規追加した 6 種類：
+  - `SLIDE-md-golden-yellow`（ゴールデンイエロー：BtoBビジネス発表・社内共有）
+  - `SLIDE-md-blue-teal-recruitment`（ブルー×ティール：採用・コーポレートブランディング）
+  - `SLIDE-md-blue-simple-diagram`（ブルー：教育・研修・図解型プレゼン）
+  - `SLIDE-md-green-blue-business`（グリーン×ブルー：営業・サービス提案・BtoB）
+  - `SLIDE-md-corporate-red`（コーポレートレッド：決算説明会・IR資料）
+  - `SLIDE-md-sky-corporate`（スカイコーポレート：統合報告書・アニュアルレポート）
+- 全サンプルのメタ情報（表示名・想定シーン・カラースウォッチ）を管理する `index.json` を追加
+
+### Changed
+
+**既存 4 種類のサンプルを全面改訂**
+- `SLIDE-md-MintGreen`・`SLIDE-md-anthropic`・`SLIDE-md-digital`・`SLIDE-md-gemini-color-system` を v1.1.0 の sample.html 共通実装スタイルで作り直し
+  - 背景アクセント丸・縦バー・ページ番号・ブランドフッター・カードコンポーネントの標準スタイルを適用
+  - スライドサイズ：960 × 540 px → 1920 × 1080 px（0.75 倍スケール表示）に統一
+
+---
+
 ## [1.1.0] - 2026-06-28
 
 ### Added
