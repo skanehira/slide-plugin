@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## [1.2.0] - 2026-07-01
+
+### Added
+
+**プラグイン配布対応**
+- `.claude-plugin/plugin.json` を追加し、Claude Code の正式なプラグイン形式に対応
+- `.claude-plugin/marketplace.json` を追加し、このリポジトリ自身をマーケットプレイスとして自己完結させ、`/plugin marketplace add skanehira/slide-skill` → `/plugin install slide-plugin` でインストール可能に
+
+### Changed
+
+**`slide-deck-builder` の自動フォールバック**
+- カレントディレクトリに `SLIDE-md/` が無い場合、プラグイン同梱の `docs/SLIDE-md/`（10種類）に自動フォールバックし、選択したデザインシステムをカスタマイズ起点としてプロジェクトへコピーするように変更
+- カレントディレクトリに `SLIDE-PATTERN/` が無い場合、プラグイン同梱の `docs/SLIDE-PATTERN/`（99種類）を直接参照するように変更（パターンは読み取り専用の共有資産のためコピーはしない）
+- 同梱ファイルも見つからない場合は、`slide-md-creator` / `slide-pattern-creator` の実行要否をその場で確認し、承認されればスキルを自動的に呼び出して続行するように変更（従来はユーザーへの案内メッセージを出してスキルを終了していた）
+
+**README**
+- インストール手順を `/plugin marketplace add` → `/plugin install` によるプラグインインストール方式に一本化（従来の手動コピー手順（方法A・方法B）を削除）
+
+---
+
 ## [1.1.1] - 2026-06-29
 
 ### Added

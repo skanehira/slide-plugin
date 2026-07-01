@@ -1,0 +1,13 @@
+{
+  "name": "slide-plugin",
+  "owner": {
+    "name": "skanehira"
+  },
+  "plugins": [
+    {
+      "name": "slide-plugin",
+      "source": "./",
+      "description": "AIとスライドを作るための設計書フォーマット「SLIDE.md」を生成する3つのClaude Codeスキル"
+    }
+  ]
+}
